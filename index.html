@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Important Question</title>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Comic Sans MS", "Arial", sans-serif;
+    overflow: hidden;
+  }
+
+  .box {
+    background: white;
+    padding: 40px;
+    border-radius: 25px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    position: relative;
+    width: 380px;
+    text-align: center;
+    animation: popIn 0.6s ease;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.6); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  h1 {
+    margin-bottom: 25px;
+  }
+
+  button {
+    padding: 14px 28px;
+    font-size: 18px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    margin: 10px;
+    transition: transform 0.2s ease;
+  }
+
+#yes {
+  background: #ff4d6d;
+  color: white;
+  --scale: 1;
+  transform: scale(var(--scale));
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0) scale(var(--scale)); }
+  50% { transform: translateY(-6px) scale(var(--scale)); }
+}
+
+  #no {
+    background: #ccc;
+    position: absolute;
+  }
+
+  .shake {
+    animation: shake 0.3s;
+  }
+
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }
+
+  #message {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+    min-height: 20px;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+</style>
+</head>
+
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="box">
+  <h1>Will you be my Valentine? 💖</h1>
+
+  <button id="yes">Yes 😌</button>
+  <button id="no">No 🙄</button>
+
+  <div id="message"></div>
+</div>
+
+<script>
+  const noBtn = document.getElementById("no");
+  const yesBtn = document.getElementById("yes");
+  const msg = document.getElementById("message");
+
+  let yesScale = 1;
+
+  const sarcasticLines = [
+    "Wow. Confidence. Misplaced, but impressive.",
+    "Interesting choice. Wrong, though.",
+    "Are we sure about that?",
+    "Emotionally unavailable button detected.",
+    "That button is lying to you.",
+    "You hovered that like you meant YES.",
+    "Let’s not pretend.",
+    "Try again. With feeling.",
+    "Your cursor knows the truth.",
+    "This is getting embarrassing for the No button."
+  ];
+
+  noBtn.addEventListener("mouseover", () => {
+    const box = document.querySelector(".box");
+
+    const x = Math.random() * (box.offsetWidth - 90);
+    const y = Math.random() * (box.offsetHeight - 50);
+
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+
+    noBtn.classList.add("shake");
+    setTimeout(() => noBtn.classList.remove("shake"), 300);
+
+    yesScale += 0.1;
+   yesBtn.style.setProperty("--scale", yesScale);
+
+    msg.textContent =
+      sarcasticLines[Math.floor(Math.random() * sarcasticLines.length)];
+  });
+
+  yesBtn.onclick = () => {
+    launchConfetti();
+    document.body.innerHTML = `
+      <h1 style="
+        color:white;
+        font-size:46px;
+        text-align:center;
+        animation: popIn 0.6s ease;
+      ">
+        🎉 YOU CHOSE CORRECTLY 🎉<br><br>
+        Valentine secured 💘😏
+      </h1>
+    `;
+  };
+
+  /* CONFETTI */
+  function launchConfetti() {
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const pieces = Array.from({ length: 150 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * 10,
+      color: `hsl(${Math.random() * 360}, 100%, 70%)`
+    }));
+
+    let angle = 0;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      });
+      update();
+    }
+
+    function update() {
+      angle += 0.01;
+      pieces.forEach(p => {
+        p.y += Math.cos(angle + p.d) + 2;
+        p.x += Math.sin(angle) * 2;
+        if (p.y > canvas.height) p.y = -10;
+      });
+    }
+
+    setInterval(draw, 16);
+  }
+</script>
+
+</body>
+</html>
+
